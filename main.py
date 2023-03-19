@@ -14,41 +14,49 @@ async def on_ready():
 @bot.slash_command(name="get_started", description="This is the start of your coding career.")
 async def get_started(ctx):
     options = [
-        disnake.ui.Button(label="Python", custom_id="python"),
-        disnake.ui.Button(label="HTML", custom_id="html"),
-        disnake.ui.Button(label="CSS", custom_id="css"),
-        disnake.ui.Button(label="JavaScript", custom_id="javascript"),
+        disnake.SelectOption(label="Python", value="python"),
+        disnake.SelectOption(label="HTML", value="html"),
+        disnake.SelectOption(label="CSS", value="css"),
+        disnake.SelectOption(label="JavaScript", value="javascript"),
     ]
-    embed = disnake.Embed(title="Select a language to learn", description="Choose a language you'd like to learn!", color=0x00ff00)
+    select = disnake.ui.Select(
+        placeholder="Select a language to learn",
+        options=options,
+        min_values=1,
+        max_values=1
+    )
     view = disnake.ui.View()
-    view.add_item(disnake.ui.Button(label="Cancel", custom_id="cancel", style=disnake.ui.ButtonStyle.danger))
-    view.add_item(*options) # Use * operator to unpack the list
-    message = await ctx.send(embed=embed, view=view)
+    view.add_item(select)
+    view.add_item(disnake.ui.Button(label="Cancel", custom_id="cancel", style=disnake.ButtonStyle.danger))
+
+    message = await ctx.send("Choose a language you'd like to learn!", view=view)
 
     def check(interaction: disnake.Interaction):
         return interaction.message.id == message.id and interaction.user.id == ctx.author.id
 
     try:
-        interaction = await bot.wait_for("button_click", timeout=60.0, check=check)
+        interaction = await bot.wait_for("select_option", timeout=60.0, check=check)
     except asyncio.TimeoutError:
-        return await message.edit(embed=disnake.Embed(title="Timed out", description="You took too long to respond!", color=0xff0000), view=None)
+        return await message.edit(content="You took too long to respond!", view=None)
 
     if interaction.custom_id == "cancel":
-        return await message.edit(embed=disnake.Embed(title="Canceled", description="You canceled the command.", color=0xff0000), view=None)
+        return await message.edit(content="You canceled the command.", view=None)
 
-    if interaction.custom_id == "python":
-        tutorial = "Python tutorial goes here!"
-    elif interaction.custom_id == "html":
-        tutorial = "HTML tutorial goes here!"
-    elif interaction.custom_id == "css":
-        tutorial = "CSS tutorial goes here!"
-    elif interaction.custom_id == "javascript":
-        tutorial = "JavaScript tutorial goes here!"
-    else:
-        return await message.edit(embed=disnake.Embed(title="Invalid option", description="You selected an invalid option.", color=0xff0000), view=None)
+    tutorial = ""
+    for value in interaction.values:
+        if value == "python":
+            tutorial += "Python tutorial goes here!\n"
+        elif value == "html":
+            tutorial += "HTML tutorial goes here!\n"
+        elif value == "css":
+            tutorial += "CSS tutorial goes here!\n"
+        elif value == "javascript":
+            tutorial += "JavaScript tutorial goes here!\n"
 
-    embed = disnake.Embed(title="Tutorial", description=tutorial, color=0x00ff00)
-    await message.edit(embed=embed, view=None)
+    if not tutorial:
+        return await message.edit(content="You didn't select a valid option.", view=None)
+
+    await message.edit(content=tutorial, view=None)
 
 if __name__ == "__main__":
     bot.run(os.getenv("DISCORD_TOKEN"))
