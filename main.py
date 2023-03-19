@@ -21,7 +21,7 @@ async def get_started(ctx):
     ]
     embed = disnake.Embed(title="Select a language to learn", description="Choose a language you'd like to learn!", color=0x00ff00)
     view = disnake.ui.View()
-    view.add_item(disnake.ui.Button(label="Cancel", custom_id="cancel", style=disnake.ui.ButtonStyle.danger))
+    view.add_item(disnake.ui.Button(label="Cancel", custom_id="cancel", style=disnake.ButtonStyle.danger))
     view.add_item(*options)
     message = await ctx.send(embed=embed, view=view)
 
@@ -49,7 +49,6 @@ async def get_started(ctx):
 
     embed = disnake.Embed(title="Tutorial", description=tutorial, color=0x00ff00)
     await message.edit(embed=embed, view=None)
-
 
 if __name__ == "__main__":
     bot.run(os.getenv("DISCORD_TOKEN"))
