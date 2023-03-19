@@ -29,10 +29,12 @@ async def get_started(ctx):
     view.add_item(select)
     view.add_item(disnake.ui.Button(label="Cancel", custom_id="cancel", style=disnake.ButtonStyle.danger))
 
+    interaction = ctx.interaction
+    await interaction.response.defer()
     message = await ctx.send("Choose a language you'd like to learn!", view=view)
 
     def check(interaction: disnake.Interaction):
-        return interaction.message.id == message.id and interaction.author.id == ctx.author.id
+        return interaction.message.id == message.id and interaction.user.id == ctx.author.id
 
     try:
         interaction = await bot.wait_for("select_option", timeout=60.0, check=check)
@@ -57,8 +59,8 @@ async def get_started(ctx):
         return await message.edit(content="You didn't select a valid option.", view=None)
     if message.view is not None:
         await message.edit(content="You took too long to respond!", view=None)
-        
-    await message.edit(content=tutorial, view=None)
+
+    await interaction.edit_original_message(content=tutorial, view=None)
 
 if __name__ == "__main__":
     bot.run(os.getenv("DISCORD_TOKEN"))
