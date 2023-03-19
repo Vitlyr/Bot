@@ -55,6 +55,9 @@ async def get_started(ctx):
 
     if not tutorial:
         return await message.edit(content="You didn't select a valid option.", view=None)
+    
+    if message.view is not None:
+    await message.edit(content="You took too long to respond!", view=None)
 
     await message.edit(content=tutorial, view=None)
 
