@@ -21,8 +21,8 @@ async def get_started(ctx):
     ]
     embed = disnake.Embed(title="Select a language to learn", description="Choose a language you'd like to learn!", color=0x00ff00)
     view = disnake.ui.View()
-    view.add_item(disnake.ui.Button(label="Cancel", custom_id="cancel", style=disnake.ButtonStyle.danger))
-    view.add_item(*options)
+    view.add_item(disnake.ui.Button(label="Cancel", custom_id="cancel", style=disnake.ui.ButtonStyle.danger))
+    view.add_item(*options) # Use * operator to unpack the list
     message = await ctx.send(embed=embed, view=view)
 
     def check(interaction: disnake.Interaction):
