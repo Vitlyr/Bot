@@ -18,7 +18,7 @@ async def help(ctx):
         embed.add_field(name=f"/{command.name}", value=command.description, inline=False)
     await ctx.send(embed=embed)
     
- @bot.slash_command(name="get_started", description="This is the start of your coding career.")
+@bot.slash_command(name="get_started", description="This is the start of your coding career.")
 async def get_started(ctx):
     embed = disnake.Embed(title="Welcome to Coding 101!", description="Are you ready to get started with your coding journey?", color=0x00ff00)
     embed.set_footer(text="Step 1 of 3")
