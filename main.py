@@ -11,46 +11,45 @@ bot = commands.Bot(command_prefix=commands.when_mentioned, intents=intents)
 async def on_ready():
     print(f"Logged in as {bot.user} (ID: {bot.user.id})\n------")
 
-@bot.slash_command(name="help", description="Displays a list of available commands.")
-async def help(ctx):
-    embed = disnake.Embed(title="Available Commands", color=0xD3D3D3)
-    for command in bot.slash_commands:
-        embed.add_field(name=f"/{command.name}", value=command.description, inline=False)
-    await ctx.send(embed=embed)
-    
 @bot.slash_command(name="get_started", description="This is the start of your coding career.")
 async def get_started(ctx):
-    embed = disnake.Embed(title="Welcome to Coding 101!", description="Are you ready to get started with your coding journey?", color=0x00ff00)
-    embed.set_footer(text="Step 1 of 3")
-    message = await ctx.send(embed=embed, components=[disnake.ui.Button(label="Next Step", custom_id="next_step")])
-    
-    def check(interaction):
+    options = [
+        disnake.ui.Button(label="Python", custom_id="python"),
+        disnake.ui.Button(label="HTML", custom_id="html"),
+        disnake.ui.Button(label="CSS", custom_id="css"),
+        disnake.ui.Button(label="JavaScript", custom_id="javascript"),
+    ]
+    embed = disnake.Embed(title="Select a language to learn", description="Choose a language you'd like to learn!", color=0x00ff00)
+    view = disnake.ui.View()
+    view.add_item(disnake.ui.Button(label="Cancel", custom_id="cancel", style=disnake.ui.ButtonStyle.danger))
+    view.add_item(*options)
+    message = await ctx.send(embed=embed, view=view)
+
+    def check(interaction: disnake.Interaction):
         return interaction.message.id == message.id and interaction.user.id == ctx.author.id
-    
+
     try:
         interaction = await bot.wait_for("button_click", timeout=60.0, check=check)
     except asyncio.TimeoutError:
-        await message.edit(components=[disnake.ui.Button(label="Next Step (Timed Out)", disabled=True)])
+        return await message.edit(embed=disnake.Embed(title="Timed out", description="You took too long to respond!", color=0xff0000), view=None)
+
+    if interaction.custom_id == "cancel":
+        return await message.edit(embed=disnake.Embed(title="Canceled", description="You canceled the command.", color=0xff0000), view=None)
+
+    if interaction.custom_id == "python":
+        tutorial = "Python tutorial goes here!"
+    elif interaction.custom_id == "html":
+        tutorial = "HTML tutorial goes here!"
+    elif interaction.custom_id == "css":
+        tutorial = "CSS tutorial goes here!"
+    elif interaction.custom_id == "javascript":
+        tutorial = "JavaScript tutorial goes here!"
     else:
-        embed.description = "Great! The first step in your coding journey is to learn a programming language. Which language would you like to start with?"
-        embed.set_footer(text="Step 2 of 3")
-        await interaction.response.edit_message(embed=embed, components=[disnake.ui.Button(label="Next Step", custom_id="next_step")])
-        
-        try:
-            interaction = await bot.wait_for("button_click", timeout=60.0, check=check)
-        except asyncio.TimeoutError:
-            await message.edit(components=[disnake.ui.Button(label="Next Step (Timed Out)", disabled=True)])
-        else:
-            embed.description = "Excellent choice! Now it's time to start learning the basics of programming. There are many great resources out there, so take your time and find what works best for you."
-            embed.set_footer(text="Step 3 of 3")
-            await interaction.response.edit_message(embed=embed, components=[disnake.ui.Button(label="Finish", custom_id="finish")])
-            
-            try:
-                interaction = await bot.wait_for("button_click", timeout=60.0, check=check)
-            except asyncio.TimeoutError:
-                await message.edit(components=[disnake.ui.Button(label="Finish (Timed Out)", disabled=True)])
-            else:
-                await interaction.response.edit_message(content="Congratulations! You've completed your first coding lesson. Happy coding!")
+        return await message.edit(embed=disnake.Embed(title="Invalid option", description="You selected an invalid option.", color=0xff0000), view=None)
+
+    embed = disnake.Embed(title="Tutorial", description=tutorial, color=0x00ff00)
+    await message.edit(embed=embed, view=None)
+
 
 if __name__ == "__main__":
     bot.run(os.getenv("DISCORD_TOKEN"))
