@@ -2,6 +2,7 @@ import os
 from disnake.ext import commands
 import disnake
 import asyncio
+import disnake_interactions
 
 intents = disnake.Intents.default()
 intents.members = True
