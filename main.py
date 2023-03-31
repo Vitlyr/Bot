@@ -23,7 +23,7 @@ async def ping(ctx):
     embed = disnake.Embed(title='Pong!', description=f'My latency is {latency:.2f}ms', color=0x2ecc71)
     await ctx.send(embed=embed)
 
-@bot.command(name="help", description="Shows all the available commands.")
+@bot.command(name="cmds", description="Shows all the available commands.")
 async def help(ctx):
     embed = disnake.Embed(title='Bot Commands', color=0xf1c40f)
     embed.add_field(name='!hello', value='Says hello', inline=False)
